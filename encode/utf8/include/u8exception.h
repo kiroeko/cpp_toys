@@ -15,19 +15,19 @@ namespace liquid {
 		{
 		public:
 			u8exception(U8_EXCEPTION_TYPE reason, const std::string message) :
-				res(reason), msg(message) {}
+				_reason(reason), _message(message) {}
 
 			U8_EXCEPTION_TYPE reason()
 			{
-				return res;
+				return _reason;
 			}
 
 			const char* what() const noexcept override {
-				return msg.c_str();
+				return _message.c_str();
 			}
 		private:
-			U8_EXCEPTION_TYPE res;
-			std::string msg;
+			U8_EXCEPTION_TYPE _reason;
+			std::string _message;
 		};
 	}
 }

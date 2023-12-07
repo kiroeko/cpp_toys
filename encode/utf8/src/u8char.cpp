@@ -3,85 +3,100 @@
 
 using namespace liquid::encode;
 
-u8char::u8char(const char& c) {
-	encode = c;
-	init_from_encode();
+u8char::u8char(const char8_t& utf8_char) {
+	_encode = utf8_char;
+	generate_bytes_from_encode();
+	_byte_count = 1;
+	generate_strings();
 }
 
-u8char::u8char(const wchar_t& c) {
-	encode = c;
-	init_from_encode();
+u8char::u8char(const unsigned long& utf8_encode) {
+	_encode = utf8_encode;
+	_byte_count = generate_bytes_from_encode();
+	generate_strings();
 }
 
-u8char::u8char(const char8_t& c) {
-	encode = c;
-	init_from_encode();
+u8char::u8char(const unsigned char& utf8_char) {
+	_encode = utf8_char;
+	generate_bytes_from_encode();
+	_byte_count = 1;
+	generate_strings();
 }
 
-u8char::u8char(const char8_t& c0, const char8_t& c1)
+u8char::u8char(const wchar_t& utf8_char) {
+	_encode = utf8_char;
+	_byte_count = generate_bytes_from_encode();
+	generate_strings();
+}
+
+u8char::u8char(const char8_t& byte0, const char8_t& byte1)
 {
-	byte1 = c1;
-	byte0 = c0;
-	init_from_bytes();
+	_bytes[0] = byte0;
+	_bytes[1] = byte1;
+	_byte_count = 2;
+	generate_encode_from_bytes(_byte_count);
+	generate_strings();
 }
 
-u8char::u8char(const char8_t& c0, const char8_t& c1, const char8_t& c2)
+u8char::u8char(const char8_t& byte0, const char8_t& byte1, const char8_t& byte2)
 {
-	byte2 = c2;
-	byte1 = c1;
-	byte0 = c0;
-	init_from_bytes();
+	_bytes[0] = byte0;
+	_bytes[1] = byte1;
+	_bytes[2] = byte2;
+	_byte_count = 3;
+	generate_encode_from_bytes(_byte_count);
+	generate_strings();
 }
 
-u8char::u8char(const char8_t& c0, const char8_t& c1, const char8_t& c2, const char8_t& c3)
+u8char::u8char(const char8_t& byte0, const char8_t& byte1, const char8_t& byte2, const char8_t& byte3)
 {
-	byte3 = c3;
-	byte2 = c2;
-	byte1 = c1;
-	byte0 = c0;
-	init_from_bytes();
+	_bytes[0] = byte0;
+	_bytes[1] = byte1;
+	_bytes[2] = byte2;
+	_bytes[3] = byte3;
+	_byte_count = 4;
+	generate_encode_from_bytes(_byte_count);
+	generate_strings();
 }
 
-u8char::u8char(const unsigned long& c) {
-	encode = c;
-	init_from_encode();
-}
-
-u8char::u8char(const std::vector<char8_t>& c) {
-	if (c.size() > 4) {
+u8char::u8char(const char8_t* const utf8_char, unsigned short byte_count)
+{
+	if (byte_count > 4) {
 		throw u8exception(
 			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
 			"A utf-8 character needs to be within 4 bytes."
 		);
 	}
 
-	int s = c.size();
-	switch (s)
+	for (int i = 0; i < byte_count; ++i)
 	{
-	case 4:
-		byte3 = c[3];
-		[[fallthrough]];
-	case 3:
-		byte2 = c[2];
-		[[fallthrough]];
-	case 2:
-		byte1 = c[1];
-		[[fallthrough]];
-	case 1:
-		byte0 = c[0];
+		_bytes[i] = utf8_char[i];
+	}
+	_byte_count = byte_count;
+	generate_encode_from_bytes(_byte_count);
+	generate_strings();
+}
+
+u8char::u8char(const std::vector<char8_t>& utf8_char) {
+	int s = utf8_char.size();
+	if (s > 4) {
+		throw u8exception(
+			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
+			"A utf-8 character needs to be within 4 bytes."
+		);
 	}
 
-	init_from_bytes();
+	for (int i = 0; i < s; ++i)
+	{
+		_bytes[i] = utf8_char[i];
+	}
+	_byte_count = s;
+	generate_encode_from_bytes(_byte_count);
+	generate_strings();
 }
 
-bool u8char::is_vaild_encode(unsigned long encode) {
-	if (0 <= encode && encode <= 0x10FFFF)
-		return true;
-	return false;
-}
-
-void u8char::init_from_encode() {
-	if (is_vaild_encode(encode)) {
+unsigned short u8char::generate_bytes_from_encode() {
+	if (is_vaild_encode(_encode)) {
 		clear();
 		throw u8exception(
 			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
@@ -89,56 +104,42 @@ void u8char::init_from_encode() {
 		);
 	}
 
-	byte3 = (unsigned char)(encode >> 24) & (unsigned char)0xFF;
-	byte2 = (unsigned char)(encode >> 16) & (unsigned char)0xFF;
-	byte1 = (unsigned char)(encode >> 8) & (unsigned char)0xFF;
-	byte0 = (unsigned char)encode & (unsigned char)0xFF;
+	unsigned short byte_count = 1;
+	for (int i = 3; i >= 0; --i)
+	{
+		_bytes[i] = (char8_t)(_encode >> (8 * i)) & (char8_t)0xFF;
+		if (_bytes[i] != 0)
+			byte_count = i+1;
+	}
+	return byte_count;
 }
 
-void u8char::init_from_bytes() {
-	encode = 0;
-	encode |= (byte3 << 24);
-	encode |= (byte2 << 16);
-	encode |= (byte1 << 8);
-	encode |= byte0;
+void u8char::generate_encode_from_bytes(unsigned short byte_count) {
+	_encode = 0;
+	for (int i = 0; i < byte_count; ++i)
+	{
+		_encode |= _bytes[i] << (8 * i);
+	}
 
-	if (is_vaild_encode(encode)) {
+	if (is_vaild_encode(_encode)) {
 		clear();
 		throw u8exception(
 			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
 			"The character range of utf-8 needs to be between 0 and 0x10FFFF."
 		);
 	}
-}
-
-std::string u8char::convert_to_str()
-{
-	std::string str;
-
-	for (const auto& c: ) {
-        s.push_back(cc);
-    }
-	str
-}
-
-std::wstring u8char::convert_to_wstr()
-{
-
-}
-
-std::u8string u8char::convert_to_u8str()
-{
-
 }
 
 void u8char::clear()
 {
-	byte3 = 0;
-	byte2 = 0;
-	byte1 = 0;
-	byte0 = 0;
-	encode = 0;
-	str.clear();
-	wstr.clear();
-	u8str.clear();
+	for (char8_t& b : _bytes)
+	{
+		b = 0;
+	}
+	_byte_count = 0;
+	_encode = 0;
+
+	_string_representation.clear();
+	_wstring_representation.clear();
+	_u8string_representation.clear();
 }
