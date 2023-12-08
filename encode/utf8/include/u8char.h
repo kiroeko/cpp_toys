@@ -19,12 +19,6 @@ namespace liquid {
 			u8char(const char8_t* const utf8_char, unsigned short byte_count);
 			u8char(const std::vector<char8_t>& utf8_char);
 
-			static bool is_vaild_encode(unsigned long utf8_encode) {
-				if (0 <= utf8_encode && utf8_encode <= 0x10FFFF)
-					return true;
-				return false;
-			}
-
 			unsigned long get_encode() {
 				return _encode;
 			}
@@ -60,6 +54,14 @@ namespace liquid {
 					str.push_back(_bytes[i]);
 				}
 				return str;
+			}
+
+			bool is_vaild_encode() {
+				if (_byte_count == 0)
+					return false;
+				if (0 <= _encode && _encode <= 0x10FFFF)
+					return true;
+				return false;
 			}
 
 			void clear();
