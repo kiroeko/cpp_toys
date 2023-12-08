@@ -1,6 +1,7 @@
 #ifndef __UTF8CHAR_H__
 #define __UTF8CHAR_H__
 
+#include <iostream>
 #include <vector>
 #include <string>
 
@@ -18,6 +19,10 @@ namespace liquid {
 			u8char(const char8_t& byte0, const char8_t& byte1, const char8_t& byte2, const char8_t& byte3);
 			u8char(const char8_t* const utf8_char, unsigned short byte_count);
 			u8char(const std::vector<char8_t>& utf8_char);
+
+			std::ostream& operator<<(std::ostream& os) {
+				return os << _string_representation;
+			}
 
 			unsigned long get_encode() {
 				return _encode;
