@@ -22,6 +22,18 @@ namespace liquid {
 			unsigned long get_encode() {
 				return _encode;
 			}
+
+			std::string to_string() {
+				return _string_representation;
+			}
+
+			std::wstring to_wstring() {
+				return _wstring_representation;
+			}
+
+			std::u8string to_u8string() {
+				return _u8string_representation;
+			}
 		private:
 			unsigned short generate_bytes_from_encode();
 			void generate_encode_from_bytes(unsigned short byte_count);
