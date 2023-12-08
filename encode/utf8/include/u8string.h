@@ -27,6 +27,16 @@ namespace liquid {
 			u8char operator[](size_t index) {
 				return _string[index];
 			}
+
+
+			std::ostream& operator<<(std::ostream& os) const {
+				for (const auto& c : _string)
+				{
+				}
+				return os;
+			}
+
+			std::istream& operator>>(std::istream& is);
 		private:
 			inline void clear()
 			{

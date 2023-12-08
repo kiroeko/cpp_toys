@@ -1,19 +1,18 @@
 #include "u8char.h"
 #include "u8exception.h"
-#include "u8string.h"
 
 using namespace liquid::encode;
+
+u8char::u8char(const unsigned long& utf8_encode) {
+	_encode = utf8_encode;
+	_byte_count = generate_bytes_from_encode();
+	generate_strings();
+}
 
 u8char::u8char(const char8_t& utf8_char) {
 	_encode = utf8_char;
 	generate_bytes_from_encode();
 	_byte_count = 1;
-	generate_strings();
-}
-
-u8char::u8char(const unsigned long& utf8_encode) {
-	_encode = utf8_encode;
-	_byte_count = generate_bytes_from_encode();
 	generate_strings();
 }
 
@@ -27,54 +26,6 @@ u8char::u8char(const unsigned char& utf8_char) {
 u8char::u8char(const wchar_t& utf8_char) {
 	_encode = utf8_char;
 	_byte_count = generate_bytes_from_encode();
-	generate_strings();
-}
-
-u8char::u8char(const char8_t& byte0, const char8_t& byte1)
-{
-	_bytes[0] = byte0;
-	_bytes[1] = byte1;
-	_byte_count = 2;
-	generate_encode_from_bytes(_byte_count);
-	generate_strings();
-}
-
-u8char::u8char(const char8_t& byte0, const char8_t& byte1, const char8_t& byte2)
-{
-	_bytes[0] = byte0;
-	_bytes[1] = byte1;
-	_bytes[2] = byte2;
-	_byte_count = 3;
-	generate_encode_from_bytes(_byte_count);
-	generate_strings();
-}
-
-u8char::u8char(const char8_t& byte0, const char8_t& byte1, const char8_t& byte2, const char8_t& byte3)
-{
-	_bytes[0] = byte0;
-	_bytes[1] = byte1;
-	_bytes[2] = byte2;
-	_bytes[3] = byte3;
-	_byte_count = 4;
-	generate_encode_from_bytes(_byte_count);
-	generate_strings();
-}
-
-u8char::u8char(const char8_t* const utf8_char, unsigned short byte_count)
-{
-	if (byte_count > 4) {
-		throw u8exception(
-			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
-			"A utf-8 character needs to be within 4 bytes."
-		);
-	}
-
-	for (int i = 0; i < byte_count; ++i)
-	{
-		_bytes[i] = utf8_char[i];
-	}
-	_byte_count = byte_count;
-	generate_encode_from_bytes(_byte_count);
 	generate_strings();
 }
 
@@ -96,27 +47,75 @@ u8char::u8char(const std::vector<char8_t>& utf8_char) {
 	generate_strings();
 }
 
+u8char::u8char(const char8_t* const utf8_char)
+{
+	bool good_end = false;
+	for (int i = 0; i < 5; ++i)
+	{
+		char8_t c = *(utf8_char + i);
+
+		if (c == '\0')
+		{
+			good_end = true;
+			_byte_count = i + 1;
+			break;
+		}
+		if (i < 4)
+		{
+			_bytes[i] = c;
+		}
+	}
+
+	if (!good_end)
+	{
+		throw u8exception(
+			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
+			"The char array passed as a utf8 char needs to be within 4 bytes and end with '\\0'."
+		);
+	}
+
+	generate_encode_from_bytes(_byte_count);
+	generate_strings();
+}
+
+u8char::u8char(const char* const utf8_char)
+{
+	bool good_end = false;
+	for (int i = 0; i < 5; ++i)
+	{
+		char c = *(utf8_char + i);
+
+		if (c == '\0')
+		{
+			good_end = true;
+			_byte_count = i + 1;
+			break;
+		}
+		if (i < 4)
+		{
+			_bytes[i] = c;
+		}
+	}
+
+	if (!good_end)
+	{
+		throw u8exception(
+			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
+			"The char array passed as a utf8 char needs to be within 4 bytes and end with '\\0'."
+		);
+	}
+
+	generate_encode_from_bytes(_byte_count);
+	generate_strings();
+}
+
 std::istream& u8char::operator>>(std::istream& is)
 {
 	std::string tmp;
 	is >> tmp;
-	u8string s(tmp);
 
-	if (s.empty())
-	{
-		throw u8exception(
-			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
-			"Invalid initialization: Incoming utf8 content is empty."
-		);
-	}
-	else if (s.size() > 1)
-	{
-		throw u8exception(
-			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
-			"Invalid initialization: Incoming utf8 content exceeds 1 character."
-		);
-	}
-	*this = s[0];
+	u8char c(tmp);
+	*this = c;
 
 	return is;
 }

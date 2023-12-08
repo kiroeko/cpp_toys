@@ -10,21 +10,36 @@ namespace liquid {
 		class u8char
 		{
 		public:
-			u8char(const char8_t& utf8_char);
 			u8char(const unsigned long& utf8_encode);
+			u8char(const char8_t& utf8_char);
 			u8char(const unsigned char& utf8_char);
 			u8char(const wchar_t& utf8_char);
-			u8char(const char8_t& byte0, const char8_t& byte1);
-			u8char(const char8_t& byte0, const char8_t& byte1, const char8_t& byte2);
-			u8char(const char8_t& byte0, const char8_t& byte1, const char8_t& byte2, const char8_t& byte3);
-			u8char(const char8_t* const utf8_char, unsigned short byte_count);
+
 			u8char(const std::vector<char8_t>& utf8_char);
 
-			std::ostream& operator<<(std::ostream& os) {
+			u8char(const char8_t* const utf8_char);
+			u8char(const std::u8string& utf8_char) : u8char(utf8_char.c_str()) {}
+
+			u8char(const char* const utf8_char);
+			u8char(const std::string& utf8_char) : u8char(utf8_char.c_str()) {}
+
+			std::ostream& operator<<(std::ostream& os) const {
 				return os << _string_representation;
 			}
 
 			std::istream& operator>>(std::istream& is);
+
+			operator std::string() const {
+				return _string_representation;
+			}
+
+			operator std::wstring() const {
+				return _wstring_representation;
+			}
+
+			operator std::u8string() const {
+				return _u8string_representation;
+			}
 
 			unsigned long get_encode() {
 				return _encode;
