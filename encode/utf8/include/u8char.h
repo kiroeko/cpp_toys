@@ -78,12 +78,12 @@ namespace liquid {
 
 			void clear();
 
-			char8_t _bytes[4];
+			char8_t _bytes[4] = { 0, 0, 0, 0 };
 			unsigned short _byte_count = 0;
 			unsigned long _encode = 0;
-			std::string _string_representation;
-			std::wstring _wstring_representation;
-			std::u8string _u8string_representation;
+			std::string _string_representation = "";
+			std::wstring _wstring_representation = L"";
+			std::u8string _u8string_representation = u8"";
 		};
 	}
 }
