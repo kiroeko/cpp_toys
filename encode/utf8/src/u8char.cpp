@@ -23,12 +23,6 @@ u8char::u8char(const unsigned char& utf8_char) {
 	generate_strings();
 }
 
-u8char::u8char(const wchar_t& utf8_char) {
-	_encode = utf8_char;
-	_byte_count = generate_bytes_from_encode();
-	generate_strings();
-}
-
 u8char::u8char(const std::vector<char8_t>& utf8_char) {
 	int s = utf8_char.size();
 	if (s > 4) {
@@ -109,17 +103,6 @@ u8char::u8char(const char* const utf8_char)
 	generate_strings();
 }
 
-std::istream& u8char::operator>>(std::istream& is)
-{
-	std::string tmp;
-	is >> tmp;
-
-	u8char c(tmp);
-	*this = c;
-
-	return is;
-}
-
 unsigned short u8char::generate_bytes_from_encode() {
 	if (is_vaild_encode()) {
 		clear();
@@ -165,6 +148,5 @@ void u8char::clear()
 	_encode = 0;
 
 	_string_representation.clear();
-	_wstring_representation.clear();
 	_u8string_representation.clear();
 }
