@@ -15,8 +15,17 @@ namespace liquid {
 			u8string(const std::wstring wide_string);
 			u8string(const std::u8string utf8_string);
 
+			bool empty()
+			{
+				return _string.size() == 0;
+			}
+
 			size_t size() {
 				return _string.size();
+			}
+
+			u8char operator[](size_t index) {
+				return _string[index];
 			}
 		private:
 			inline void clear()

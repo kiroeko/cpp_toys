@@ -102,6 +102,22 @@ std::istream& u8char::operator>>(std::istream& is)
 	is >> tmp;
 	u8string s(tmp);
 
+	if (s.empty())
+	{
+		throw u8exception(
+			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
+			"Invalid initialization: Incoming utf8 content is empty."
+		);
+	}
+	else if (s.size() > 1)
+	{
+		throw u8exception(
+			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
+			"Invalid initialization: Incoming utf8 content exceeds 1 character."
+		);
+	}
+	*this = s[0];
+
 	return is;
 }
 
