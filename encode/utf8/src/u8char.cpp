@@ -5,21 +5,21 @@ using namespace liquid::encode;
 
 u8char::u8char(const unsigned long& utf8_encode) {
 	_encode = utf8_encode;
-	_byte_count = generate_bytes_from_encode();
+	_part_count = generate_bytes_from_encode();
 	generate_strings();
 }
 
 u8char::u8char(const char8_t& utf8_char) {
 	_encode = utf8_char;
 	generate_bytes_from_encode();
-	_byte_count = 1;
+	_part_count = 1;
 	generate_strings();
 }
 
 u8char::u8char(const unsigned char& utf8_char) {
 	_encode = utf8_char;
 	generate_bytes_from_encode();
-	_byte_count = 1;
+	_part_count = 1;
 	generate_strings();
 }
 
@@ -34,10 +34,10 @@ u8char::u8char(const std::vector<char8_t>& utf8_char) {
 
 	for (int i = 0; i < s; ++i)
 	{
-		_bytes[i] = utf8_char[i];
+		_parts[i] = utf8_char[i];
 	}
-	_byte_count = s;
-	generate_encode_from_bytes(_byte_count);
+	_part_count = s;
+	generate_encode_from_bytes(_part_count);
 	generate_strings();
 }
 
@@ -51,12 +51,12 @@ u8char::u8char(const char8_t* const utf8_char)
 		if (c == '\0')
 		{
 			good_end = true;
-			_byte_count = i + 1;
+			_part_count = i + 1;
 			break;
 		}
 		if (i < 4)
 		{
-			_bytes[i] = c;
+			_parts[i] = c;
 		}
 	}
 
@@ -68,7 +68,7 @@ u8char::u8char(const char8_t* const utf8_char)
 		);
 	}
 
-	generate_encode_from_bytes(_byte_count);
+	generate_encode_from_bytes(_part_count);
 	generate_strings();
 }
 
@@ -82,12 +82,12 @@ u8char::u8char(const char* const utf8_char)
 		if (c == '\0')
 		{
 			good_end = true;
-			_byte_count = i + 1;
+			_part_count = i + 1;
 			break;
 		}
 		if (i < 4)
 		{
-			_bytes[i] = c;
+			_parts[i] = c;
 		}
 	}
 
@@ -99,7 +99,7 @@ u8char::u8char(const char* const utf8_char)
 		);
 	}
 
-	generate_encode_from_bytes(_byte_count);
+	generate_encode_from_bytes(_part_count);
 	generate_strings();
 }
 
@@ -115,8 +115,8 @@ unsigned short u8char::generate_bytes_from_encode() {
 	unsigned short byte_count = 1;
 	for (int i = 3; i >= 0; --i)
 	{
-		_bytes[i] = (char8_t)(_encode >> (8 * i)) & (char8_t)0xFF;
-		if (_bytes[i] != 0)
+		_parts[i] = (char8_t)(_encode >> (8 * i)) & (char8_t)0xFF;
+		if (_parts[i] != 0)
 			byte_count = i+1;
 	}
 	return byte_count;
@@ -126,7 +126,7 @@ void u8char::generate_encode_from_bytes(unsigned short byte_count) {
 	_encode = 0;
 	for (int i = 0; i < byte_count; ++i)
 	{
-		_encode |= _bytes[i] << (8 * i);
+		_encode |= _parts[i] << (8 * i);
 	}
 
 	if (is_vaild_encode()) {
@@ -140,11 +140,11 @@ void u8char::generate_encode_from_bytes(unsigned short byte_count) {
 
 void u8char::clear()
 {
-	for (char8_t& b : _bytes)
+	for (char8_t& b : _parts)
 	{
 		b = 0;
 	}
-	_byte_count = 0;
+	_part_count = 0;
 	_encode = 0;
 
 	_string_representation.clear();

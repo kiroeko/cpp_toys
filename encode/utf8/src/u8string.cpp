@@ -59,3 +59,21 @@ u8string::u8string(const std::u8string& utf8_string)
         _string.push_back(c);
     }
 }
+
+std::string u8string::to_string() const
+{
+    std::string tmp;
+    for (const auto& c : _string) {
+        tmp += c.to_string();
+    }
+    return tmp;
+}
+
+std::u8string u8string::to_u8string() const
+{
+    std::u8string tmp;
+    for (const auto& c : _string) {
+        tmp += c.to_u8string();
+    }
+    return tmp;
+}

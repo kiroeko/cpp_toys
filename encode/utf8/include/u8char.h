@@ -22,10 +22,6 @@ namespace liquid {
 			u8char(const char* const utf8_char);
 			u8char(const std::string& utf8_char) : u8char(utf8_char.c_str()) {}
 
-			char8_t operator[](size_t index) const {
-				return _bytes[index];
-			}
-
 			friend std::ostream& operator<<(std::ostream& os, const u8char& utf8_char) {
 				return os << utf8_char._string_representation;
 			}
@@ -52,16 +48,20 @@ namespace liquid {
 				return _encode;
 			}
 
-			size_t size() const {
-				return _byte_count;
-			}
-
 			std::string to_string() const {
 				return _string_representation;
 			}
 
 			std::u8string to_u8string() const {
 				return _u8string_representation;
+			}
+
+			size_t part_size() const {
+				return _part_count;
+			}
+
+			char8_t get_part(size_t index) const {
+				return _parts[index];
 			}
 		private:
 			unsigned short generate_bytes_from_encode();
@@ -74,24 +74,24 @@ namespace liquid {
 
 			std::string generate_string() const {
 				std::string str;
-				for (int i = 0; i < _byte_count; ++i)
+				for (int i = 0; i < _part_count; ++i)
 				{
-					str.push_back(_bytes[i]);
+					str.push_back(_parts[i]);
 				}
 				return str;
 			}
 
 			std::u8string generate_u8string() const {
 				std::u8string str;
-				for (int i = 0; i < _byte_count; ++i)
+				for (int i = 0; i < _part_count; ++i)
 				{
-					str.push_back(_bytes[i]);
+					str.push_back(_parts[i]);
 				}
 				return str;
 			}
 
 			bool is_vaild_encode() const {
-				if (_byte_count == 0)
+				if (_part_count == 0)
 					return false;
 				if (0 <= _encode && _encode <= 0x10FFFF)
 					return true;
@@ -100,8 +100,8 @@ namespace liquid {
 
 			inline void clear();
 
-			char8_t _bytes[4] = { 0, 0, 0, 0 };
-			unsigned short _byte_count = 0;
+			char8_t _parts[4] = { 0, 0, 0, 0 };
+			unsigned short _part_count = 0;
 			unsigned long _encode = 0;
 			std::string _string_representation = "";
 			std::u8string _u8string_representation = u8"";
