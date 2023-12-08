@@ -24,6 +24,8 @@ namespace liquid {
 				return os << _string_representation;
 			}
 
+			std::istream& operator>>(std::istream& is);
+
 			unsigned long get_encode() {
 				return _encode;
 			}
@@ -81,7 +83,7 @@ namespace liquid {
 				return false;
 			}
 
-			void clear();
+			inline void clear();
 
 			char8_t _bytes[4] = { 0, 0, 0, 0 };
 			unsigned short _byte_count = 0;

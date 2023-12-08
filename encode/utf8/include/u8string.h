@@ -1,6 +1,7 @@
 #ifndef __U8STRING_H__
 #define __U8STRING_H__
 
+#include <iostream>
 #include <vector>
 #include <string>
 #include "u8char.h"
@@ -18,6 +19,11 @@ namespace liquid {
 				return _string.size();
 			}
 		private:
+			inline void clear()
+			{
+				_string.clear();
+			}
+
 			std::vector<u8char> _string;
 		};
 	}

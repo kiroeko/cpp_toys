@@ -1,5 +1,6 @@
 #include "u8char.h"
 #include "u8exception.h"
+#include "u8string.h"
 
 using namespace liquid::encode;
 
@@ -93,6 +94,15 @@ u8char::u8char(const std::vector<char8_t>& utf8_char) {
 	_byte_count = s;
 	generate_encode_from_bytes(_byte_count);
 	generate_strings();
+}
+
+std::istream& u8char::operator>>(std::istream& is)
+{
+	std::string tmp;
+	is >> tmp;
+	u8string s(tmp);
+
+	return is;
 }
 
 unsigned short u8char::generate_bytes_from_encode() {
