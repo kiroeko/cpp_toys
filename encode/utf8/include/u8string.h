@@ -57,6 +57,38 @@ namespace liquid {
 				return is;
 			}
 
+			auto begin() {
+				return _string.begin();
+			}
+
+			auto end() {
+				return _string.end();
+			}
+
+			auto rbegin() {
+				return _string.rbegin();
+			}
+
+			auto rend() {
+				return _string.rend();
+			}
+
+			auto cbegin() const {
+				return _string.cbegin();
+			}
+
+			auto cend() const {
+				return _string.cend();
+			}
+
+			auto crbegin() const {
+				return _string.crbegin();
+			}
+
+			auto crend() const {
+				return _string.crend();
+			}
+
 			operator std::string() const {
 				return to_string();
 			}

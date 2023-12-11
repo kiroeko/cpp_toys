@@ -10,5 +10,10 @@ int main()
 	auto str1 = str0 += c0;
 	std::cout << str1 << std::endl;
 
+	for (auto& c : str1)
+	{
+		std::cout << c << std::endl;
+	}
+
 	return 0;
 }
