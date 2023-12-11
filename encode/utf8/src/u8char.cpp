@@ -126,7 +126,7 @@ unsigned short u8char::generate_bytes_from_encode() {
 		clear();
 		throw u8exception(
 			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
-			"The character range of utf-8 needs to be between 0 and 0x10FFFF."
+			"The character range of utf-8 needs to be between 0 and 0xEFBFBFBF."
 		);
 	}
 
@@ -151,7 +151,7 @@ void u8char::generate_encode_from_bytes(unsigned short byte_count) {
 		clear();
 		throw u8exception(
 			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
-			"The character range of utf-8 needs to be between 0 and 0x10FFFF."
+			"The character range of utf-8 needs to be between 0 and 0xEFBFBFBF."
 		);
 	}
 }
