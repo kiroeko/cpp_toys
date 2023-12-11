@@ -23,24 +23,6 @@ u8char::u8char(const unsigned char& utf8_char) {
 	generate_strings();
 }
 
-u8char::u8char(const std::vector<char8_t>& utf8_char) {
-	int s = utf8_char.size();
-	if (s > 4) {
-		throw u8exception(
-			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
-			"A utf-8 character needs to be within 4 bytes."
-		);
-	}
-
-	for (int i = 0; i < s; ++i)
-	{
-		_parts[i] = utf8_char[i];
-	}
-	_part_count = s;
-	generate_encode_from_bytes(_part_count);
-	generate_strings();
-}
-
 u8char::u8char(const char8_t* const utf8_char)
 {
 	bool good_end = false;
@@ -72,6 +54,24 @@ u8char::u8char(const char8_t* const utf8_char)
 	generate_strings();
 }
 
+u8char::u8char(const std::vector<char8_t>& utf8_char) {
+	int s = utf8_char.size();
+	if (s > 4) {
+		throw u8exception(
+			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
+			"A utf-8 character needs to be within 4 bytes."
+		);
+	}
+
+	for (int i = 0; i < s; ++i)
+	{
+		_parts[i] = utf8_char[i];
+	}
+	_part_count = s;
+	generate_encode_from_bytes(_part_count);
+	generate_strings();
+}
+
 u8char::u8char(const char* const utf8_char)
 {
 	bool good_end = false;
@@ -99,6 +99,24 @@ u8char::u8char(const char* const utf8_char)
 		);
 	}
 
+	generate_encode_from_bytes(_part_count);
+	generate_strings();
+}
+
+u8char::u8char(const std::vector<char>& utf8_char) {
+	int s = utf8_char.size();
+	if (s > 4) {
+		throw u8exception(
+			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
+			"A utf-8 character needs to be within 4 bytes."
+		);
+	}
+
+	for (int i = 0; i < s; ++i)
+	{
+		_parts[i] = utf8_char[i];
+	}
+	_part_count = s;
 	generate_encode_from_bytes(_part_count);
 	generate_strings();
 }

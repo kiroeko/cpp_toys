@@ -14,15 +14,42 @@ namespace liquid {
 			u8char(const char8_t& utf8_char);
 			u8char(const unsigned char& utf8_char);
 
-			u8char(const std::vector<char8_t>& utf8_char);
-
 			u8char(const char8_t* const utf8_char);
 			u8char(const std::u8string& utf8_char) : u8char(utf8_char.c_str()) {}
+			u8char(const std::vector<char8_t>& utf8_char);
 
 			u8char(const char* const utf8_char);
 			u8char(const std::string& utf8_char) : u8char(utf8_char.c_str()) {}
+			u8char(const std::vector<char>& utf8_char);
+
+			bool operator<(const u8char& other) const {
+				return _encode < other._encode;
+			}
+
+			bool operator>(const u8char& other) const {
+				return _encode > other._encode;
+			}
+
+			bool operator==(const u8char& other) const {
+				return _encode == other._encode;
+			}
+
+			bool operator>=(const u8char& other) const {
+				return _encode >= other._encode;
+			}
+
+			bool operator<=(const u8char& other) const {
+				return _encode <= other._encode;
+			}
+
+			bool operator!=(const u8char& other) const {
+				return _encode != other._encode;
+			}
 
 			friend std::ostream& operator<<(std::ostream& os, const u8char& utf8_char) {
+				if (!utf8_char.is_vaild_encode())
+					return os;
+				
 				return os << utf8_char._string_representation;
 			}
 

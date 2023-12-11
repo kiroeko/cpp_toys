@@ -11,14 +11,32 @@ namespace liquid {
 		class u8string
 		{
 		public:
-			u8string(const std::string& string);
-			u8string(const char* const utf8_char) : u8string((std::string)utf8_char) {}
+			u8string(const std::u8string& string);
+			u8string(const char8_t* const string) : u8string((std::u8string)string) {}
+			u8string(const std::vector<char8_t> string) : u8string(string.data()) {}
 
-			u8string(const std::u8string& utf8_string);
-			u8string(const char8_t* const utf8_char) : u8string((std::u8string)utf8_char) {}
+			u8string(const std::string& string);
+			u8string(const char* const string) : u8string((std::string)string) {}
+			u8string(const std::vector<char> string) : u8string(string.data()) {}
+
+			u8string(const std::vector<u8char> string);
 
 			u8char operator[](size_t index) const {
 				return _string[index];
+			}
+
+			friend u8string operator+(const u8string& u8str1, const u8string& u8str2) {
+				std::vector<u8char> tmp = u8str1._string;
+				for (const auto& c : u8str2._string) {
+					tmp.push_back(c);
+				}
+				u8string tmp_str(tmp);
+				return tmp;
+			}
+
+			friend u8string operator+=(u8string& u8str, const u8char& utf8_char) {
+				u8str._string.push_back(utf8_char);
+				return u8str;
 			}
 
 			friend std::ostream& operator<<(std::ostream& os, const u8string& utf8_string) {
@@ -47,8 +65,7 @@ namespace liquid {
 				return to_u8string();
 			}
 
-			bool empty()
-			{
+			bool empty() const {
 				return _string.size() == 0;
 			}
 
