@@ -130,14 +130,30 @@ unsigned short u8char::generate_bytes_from_encode() {
 		);
 	}
 
-	unsigned short byte_count = 1;
+	bool partHasValue = false;
+	unsigned short part_count = 0;
+
+	int partIdx = 0;
 	for (int i = 3; i >= 0; --i)
 	{
-		_parts[i] = (char8_t)(_encode >> (8 * i)) & (char8_t)0xFF;
-		if (_parts[i] != 0)
-			byte_count = i+1;
+		char8_t c = (char8_t)(_encode >> (8 * i)) & (char8_t)0xFF;
+
+		if (!partHasValue)
+		{
+			if (c != 0)
+			{
+				partHasValue = true;
+				part_count = i+1;
+			}
+			else
+				continue;
+		}
+
+		_parts[partIdx] = c;
+		++partIdx;
 	}
-	return byte_count;
+
+	return part_count;
 }
 
 void u8char::generate_encode_from_bytes(unsigned short byte_count) {

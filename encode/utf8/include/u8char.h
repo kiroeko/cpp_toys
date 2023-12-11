@@ -13,6 +13,7 @@ namespace liquid {
 			u8char(const unsigned long& utf8_encode);
 			u8char(const char8_t& utf8_char);
 			u8char(const unsigned char& utf8_char);
+			u8char(const char& utf8_char) : u8char((unsigned char)utf8_char) {}
 
 			u8char(const char8_t* const utf8_char);
 			u8char(const std::u8string& utf8_char) : u8char(utf8_char.c_str()) {}
@@ -47,9 +48,6 @@ namespace liquid {
 			}
 
 			friend std::ostream& operator<<(std::ostream& os, const u8char& utf8_char) {
-				if (!utf8_char.is_vaild_encode())
-					return os;
-				
 				return os << utf8_char._string_representation;
 			}
 
@@ -118,8 +116,6 @@ namespace liquid {
 			}
 
 			bool is_vaild_encode() const {
-				if (_part_count == 0)
-					return false;
 				if (0 <= _encode && _encode <= 0xEFBFBFBF)
 					return true;
 				return false;
