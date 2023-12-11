@@ -25,6 +25,14 @@ namespace liquid {
 				return _string[index];
 			}
 
+			bool operator==(const u8char& other) const {
+				return to_string() == other.to_string();
+			}
+
+			bool operator!=(const u8char& other) const {
+				return to_string() != other.to_string();
+			}
+
 			friend u8string operator+(const u8string& u8str1, const u8string& u8str2) {
 				std::vector<u8char> tmp = u8str1._string;
 				for (const auto& c : u8str2._string) {
