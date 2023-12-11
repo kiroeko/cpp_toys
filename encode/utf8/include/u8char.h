@@ -120,7 +120,7 @@ namespace liquid {
 			bool is_vaild_encode() const {
 				if (_part_count == 0)
 					return false;
-				if (0 <= _encode && _encode <= 0x10FFFF)
+				if (0 <= _encode && _encode <= 0xEFBFBFBF)
 					return true;
 				return false;
 			}

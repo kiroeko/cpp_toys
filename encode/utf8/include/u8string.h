@@ -13,13 +13,13 @@ namespace liquid {
 		public:
 			u8string(const std::u8string& string);
 			u8string(const char8_t* const string) : u8string((std::u8string)string) {}
-			u8string(const std::vector<char8_t> string) : u8string(string.data()) {}
+			u8string(const std::vector<char8_t>& string) : u8string(string.data()) {}
 
 			u8string(const std::string& string);
 			u8string(const char* const string) : u8string((std::string)string) {}
-			u8string(const std::vector<char> string) : u8string(string.data()) {}
+			u8string(const std::vector<char>& string) : u8string(string.data()) {}
 
-			u8string(const std::vector<u8char> string);
+			u8string(const std::vector<u8char>& string);
 
 			u8char operator[](size_t index) const {
 				return _string[index];

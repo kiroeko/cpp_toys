@@ -122,7 +122,7 @@ u8char::u8char(const std::vector<char>& utf8_char) {
 }
 
 unsigned short u8char::generate_bytes_from_encode() {
-	if (is_vaild_encode()) {
+	if (!is_vaild_encode()) {
 		clear();
 		throw u8exception(
 			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
@@ -144,10 +144,10 @@ void u8char::generate_encode_from_bytes(unsigned short byte_count) {
 	_encode = 0;
 	for (int i = 0; i < byte_count; ++i)
 	{
-		_encode |= _parts[i] << (8 * i);
+		_encode |= _parts[i] << (8 * (4-1-i));
 	}
 
-	if (is_vaild_encode()) {
+	if (!is_vaild_encode()) {
 		clear();
 		throw u8exception(
 			U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
