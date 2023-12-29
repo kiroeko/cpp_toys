@@ -23,6 +23,28 @@ namespace liquid {
 
 			std::vector<u8string> split(const u8char& delimiter);
 
+			std::u8string join(const u8string& u8str2)
+			{
+				return *this += u8str2;
+			}
+
+			bool empty() const {
+				return _string.size() == 0;
+			}
+
+			void clear()
+			{
+				_string.clear();
+			}
+
+			size_t size() const {
+				return _string.size();
+			}
+
+			std::string to_string() const;
+
+			std::u8string to_u8string() const;
+
 			u8char operator[](size_t index) const {
 				return _string[index];
 			}
@@ -111,24 +133,7 @@ namespace liquid {
 			operator std::u8string() const {
 				return to_u8string();
 			}
-
-			bool empty() const {
-				return _string.size() == 0;
-			}
-
-			size_t size() const {
-				return _string.size();
-			}
-
-			std::string to_string() const;
-
-			std::u8string to_u8string() const;
 		private:
-			void clear()
-			{
-				_string.clear();
-			}
-
 			std::vector<u8char> _string;
 		};
 	}
