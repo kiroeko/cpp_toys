@@ -117,7 +117,7 @@ namespace liquid {
 
 			std::u8string to_u8string() const;
 		private:
-			inline void clear()
+			void clear()
 			{
 				_string.clear();
 			}
