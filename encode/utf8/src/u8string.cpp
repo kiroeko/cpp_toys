@@ -65,6 +65,27 @@ u8string::u8string(const std::vector<u8char>& string)
     _string = string;
 }
 
+std::vector<u8string> u8string::split(const u8char& delimiter)
+{
+    std::vector<u8string> result;
+    auto iter = _string.begin();
+    while (true)
+    {
+        std::vector<u8char> part;
+        auto part_end = std::find(iter, _string.end(), delimiter);
+        for (auto i = iter; i < part_end; ++i)
+        {
+            part.push_back(*i);
+        }
+        u8string part_str(part);
+        result.push_back(part_str);
+
+        if (part_end >= _string.end() - 1)
+            break;
+        iter = part_end + 1;
+    }
+}
+
 std::string u8string::to_string() const
 {
     std::string tmp;

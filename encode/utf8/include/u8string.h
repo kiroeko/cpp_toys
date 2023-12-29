@@ -21,6 +21,8 @@ namespace liquid {
 
 			u8string(const std::vector<u8char>& string);
 
+			std::vector<u8string> split(const u8char& delimiter);
+
 			u8char operator[](size_t index) const {
 				return _string[index];
 			}
