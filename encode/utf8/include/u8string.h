@@ -49,6 +49,11 @@ namespace liquid {
 				return u8str;
 			}
 
+			friend u8string operator+=(u8string& u8str, const u8string& u8str2) {
+				u8str._string.append_range(u8str2._string);
+				return u8str;
+			}
+
 			friend std::ostream& operator<<(std::ostream& os, const u8string& utf8_string) {
 				for (const auto& c : utf8_string._string)
 				{
