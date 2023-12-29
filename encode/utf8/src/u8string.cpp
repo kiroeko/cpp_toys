@@ -68,6 +68,9 @@ u8string::u8string(const std::vector<u8char>& string)
 std::vector<u8string> u8string::split(const u8char& delimiter)
 {
     std::vector<u8string> result;
+    if (_string.empty())
+        return result;
+
     auto iter = _string.begin();
     while (true)
     {
@@ -84,6 +87,8 @@ std::vector<u8string> u8string::split(const u8char& delimiter)
             break;
         iter = part_end + 1;
     }
+
+    return result;
 }
 
 std::string u8string::to_string() const
