@@ -89,7 +89,7 @@ namespace liquid::encode
 			_string = string;
 		}
 
-		std::vector<u8string> split(const u8char& delimiter)
+		std::vector<u8string> split(const u8char& delimiter) const
 		{
 			std::vector<u8string> result;
 			if (_string.empty())
@@ -504,7 +504,7 @@ namespace liquid::encode
 			_string = string;
 		}
 
-		std::vector<u8string> split(const u8char& delimiter)
+		std::vector<u8string> split(const u8char& delimiter) const
 		{
 			std::vector<u8string> result;
 			if (_string.empty())
@@ -866,7 +866,7 @@ namespace liquid::encode
 			_string = string;
 		}
 
-		std::vector<u8string> split(const u8char& delimiter)
+		std::vector<u8string> split(const u8char& delimiter) const
 		{
 			std::vector<u8string> result;
 			if (_string.empty())
