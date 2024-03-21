@@ -9,8 +9,7 @@ int main()
 	liquid::encode::u8char c2(15118729ul);
 	liquid::encode::u8char c3(u8"码");
 
-	std::u8string tmps0 = u8"你好，世界！";
-	liquid::encode::u8string str0 = tmps0;
+	liquid::encode::u8string str0 = u8"你好，世界！";
 	liquid::encode::u8string str1(u8"编码");
 	liquid::encode::u8string str2("开发");
 
