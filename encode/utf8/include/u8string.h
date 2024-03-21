@@ -4,11 +4,20 @@
 #if __cplusplus >= 201700L && __cplusplus < 202000L
 // Implement for the version C++17.
 
+#include <iostream>
+#include <functional>
+#include <ranges>
+#include <string>
+#include <vector>
+#include "u8char.h"
+
 namespace liquid::encode
 {
 	class u8string
 	{
 	public:
+		u8string() : u8string("") {}
+
 		u8string(const std::string& string)
 		{
 			std::vector<std::vector<char>> u8char_list;
@@ -106,6 +115,105 @@ namespace liquid::encode
 			return result;
 		}
 
+		u8string sub_string(size_t len) const
+		{
+			return sub_string(0, len);
+		}
+
+		u8string sub_string(size_t start_index, size_t len) const
+		{
+			size_t end_index = start_index + len;
+			size_t max = _string.size();
+			if (end_index > max)
+				end_index = max;
+
+			std::vector<u8char> substr;
+			for (size_t i = start_index; i < end_index; ++i)
+			{
+				substr.push_back(_string[i]);
+			}
+			return u8string(substr);
+		}
+
+		u8string replace(u8char old_char, u8char new_char, bool replace_all = true) const
+		{
+			return replace(new_char, [&old_char](const u8char& c) { return c == old_char; }, replace_all);
+		}
+
+		u8string replace(u8char new_char, std::function<bool(const u8char&)> func, bool replace_all = true) const
+		{
+			u8string copy_str(*this);
+			if (func == nullptr)
+				return copy_str;
+
+			size_t max = copy_str.size();
+			for (size_t i = 0; i < max; ++i)
+			{
+				if (func(copy_str[i]))
+				{
+					copy_str[i] = new_char;
+					if (!replace_all)
+						break;
+				}
+			}
+			return copy_str;
+		}
+
+		u8string replace(u8string old_string, u8string new_string, bool replace_all = true) const
+		{
+			if (old_string.empty())
+				return *this;
+
+			u8string copy_str(*this);
+			if (copy_str.empty())
+				return copy_str;
+			size_t copy_str_size = copy_str.size();
+			size_t old_str_size = old_string.size();
+			if (copy_str_size < old_str_size)
+				return copy_str;
+
+			for (size_t i = 0; i <= (copy_str_size - old_str_size); ++i)
+			{
+				if (std::equal(copy_str._string.begin()+i, copy_str._string.end()+i+old_str_size, old_string._string.begin()))
+				{
+					std::copy(old_string._string.begin(), old_string._string.end(), copy_str._string.begin()+i);
+					if (!replace_all)
+						break;
+				}
+			}
+		}
+
+		u8char* find(std::function<bool(const u8char&)> func)
+		{
+			if (func == nullptr)
+				return nullptr;
+
+			for (auto& c : _string)
+			{
+				if (func(c))
+				{
+					return &c;
+				}
+			}
+			return nullptr;
+		}
+
+		std::vector<u8char*> find_all(std::function<bool(const u8char&)> func)
+		{
+			if (func == nullptr)
+				return std::vector<u8char*>();
+
+			std::vector<u8char*> find_results;
+			for (auto& c : _string)
+			{
+				if (func(c))
+				{
+					find_results.push_back(&c);
+				}
+			}
+			return find_results;
+		}
+
 		bool empty() const
 		{
 			return _string.size() == 0;
@@ -131,7 +239,7 @@ namespace liquid::encode
 			return tmp;
 		}
 
-		u8char operator[](size_t index) const
+		u8char& operator[](size_t index)
 		{
 			return _string[index];
 		}
@@ -241,9 +349,10 @@ namespace liquid::encode
 // Implement for the version C++20.
 
 #include <iostream>
-#include <vector>
-#include <string>
+#include <functional>
 #include <ranges>
+#include <string>
+#include <vector>
 #include "u8char.h"
 
 namespace liquid::encode
@@ -251,6 +360,8 @@ namespace liquid::encode
 	class u8string
 	{
 	public:
+		u8string() : u8string("") {}
+
 		u8string(const std::u8string& string)
 		{
 			std::vector<std::vector<char8_t>> u8char_list;
@@ -358,7 +469,7 @@ namespace liquid::encode
 
 			for (const auto& temp_u8char : u8char_list)
 			{
-				unsigned long count = std::ranges::distance(temp_u8char);
+				unsigned int count = std::ranges::distance(temp_u8char);
 				if (count > 4)
 				{
 					clear();
@@ -414,6 +525,105 @@ namespace liquid::encode
 			return result;
 		}
 
+		u8string sub_string(size_t len) const
+		{
+			return sub_string(0, len);
+		}
+
+		u8string sub_string(size_t start_index, size_t len) const
+		{
+			size_t end_index = start_index + len;
+			size_t max = _string.size();
+			if (end_index > max)
+				end_index = max;
+
+			std::vector<u8char> substr;
+			for (size_t i = start_index; i < end_index; ++i)
+			{
+				substr.push_back(_string[i]);
+			}
+			return u8string(substr);
+		}
+
+		u8string replace(u8char old_char, u8char new_char, bool replace_all = true) const
+		{
+			return replace(new_char, [&old_char](const u8char& c) { return c == old_char; }, replace_all);
+		}
+
+		u8string replace(u8char new_char, std::function<bool(const u8char&)> func, bool replace_all = true) const
+		{
+			u8string copy_str(*this);
+			if (func == nullptr)
+				return copy_str;
+
+			size_t max = copy_str.size();
+			for (size_t i = 0; i < max; ++i)
+			{
+				if (func(copy_str[i]))
+				{
+					copy_str[i] = new_char;
+					if (!replace_all)
+						break;
+				}
+			}
+			return copy_str;
+		}
+
+		u8string replace(u8string old_string, u8string new_string, bool replace_all = true) const
+		{
+			if (old_string.empty())
+				return *this;
+
+			u8string copy_str(*this);
+			if (copy_str.empty())
+				return copy_str;
+			size_t copy_str_size = copy_str.size();
+			size_t old_str_size = old_string.size();
+			if (copy_str_size < old_str_size)
+				return copy_str;
+
+			for (size_t i = 0; i <= (copy_str_size - old_str_size); ++i)
+			{
+				if (std::equal(copy_str._string.begin() + i, copy_str._string.end() + i + old_str_size, old_string._string.begin()))
+				{
+					std::copy(old_string._string.begin(), old_string._string.end(), copy_str._string.begin() + i);
+					if (!replace_all)
+						break;
+				}
+			}
+		}
+
+		u8char* find(std::function<bool(const u8char&)> func)
+		{
+			if (func == nullptr)
+				return nullptr;
+
+			for (auto& c : _string)
+			{
+				if (func(c))
+				{
+					return &c;
+				}
+			}
+			return nullptr;
+		}
+
+		std::vector<u8char*> find_all(std::function<bool(const u8char&)> func)
+		{
+			if (func == nullptr)
+				return std::vector<u8char*>();
+
+			std::vector<u8char*> find_results;
+			for (auto& c : _string)
+			{
+				if (func(c))
+				{
+					find_results.push_back(&c);
+				}
+			}
+			return find_results;
+		}
+
 		std::u8string join(const u8string& u8str2)
 		{
 			return *this += u8str2;
@@ -454,7 +664,7 @@ namespace liquid::encode
 			return tmp;
 		}
 
-		u8char operator[](size_t index) const
+		u8char& operator[](size_t index)
 		{
 			return _string[index];
 		}
@@ -569,9 +779,10 @@ namespace liquid::encode
 // Implement for versions C++23 and later.
 
 #include <iostream>
-#include <vector>
-#include <string>
+#include <functional>
 #include <ranges>
+#include <string>
+#include <vector>
 #include "u8char.h"
 
 namespace liquid::encode
@@ -579,6 +790,8 @@ namespace liquid::encode
 	class u8string
 	{
 	public:
+		u8string() : u8string("") {}
+
 		u8string(const std::u8string& string)
 		{
 			auto u8slice = [](const auto& c1, const auto& c2) { return (0b11000000 & c2) == 0b10000000; };
@@ -586,7 +799,7 @@ namespace liquid::encode
 
 			for (const auto& temp_u8char : u8char_list)
 			{
-				unsigned long count = std::ranges::distance(temp_u8char);
+				unsigned int count = std::ranges::distance(temp_u8char);
 				if (count > 4)
 				{
 					clear();
@@ -618,7 +831,7 @@ namespace liquid::encode
 
 			for (const auto& temp_u8char : u8char_list)
 			{
-				unsigned long count = std::ranges::distance(temp_u8char);
+				unsigned int count = std::ranges::distance(temp_u8char);
 				if (count > 4)
 				{
 					clear();
@@ -674,6 +887,105 @@ namespace liquid::encode
 			return result;
 		}
 
+		u8string sub_string(size_t len) const
+		{
+			return sub_string(0, len);
+		}
+
+		u8string sub_string(size_t start_index, size_t len) const
+		{
+			size_t end_index = start_index + len;
+			size_t max = _string.size();
+			if (end_index > max)
+				end_index = max;
+
+			std::vector<u8char> substr;
+			for (size_t i = start_index; i < end_index; ++i)
+			{
+				substr.push_back(_string[i]);
+			}
+			return u8string(substr);
+		}
+
+		u8string replace(u8char old_char, u8char new_char, bool replace_all = true) const
+		{
+			return replace(new_char, [&old_char](const u8char& c) { return c == old_char; }, replace_all);
+		}
+
+		u8string replace(u8char new_char, std::function<bool(const u8char&)> func, bool replace_all = true) const
+		{
+			u8string copy_str(*this);
+			if (func == nullptr)
+				return copy_str;
+
+			size_t max = copy_str.size();
+			for (size_t i = 0; i < max; ++i)
+			{
+				if (func(copy_str[i]))
+				{
+					copy_str[i] = new_char;
+					if (!replace_all)
+						break;
+				}
+			}
+			return copy_str;
+		}
+
+		u8string replace(u8string old_string, u8string new_string, bool replace_all = true) const
+		{
+			if (old_string.empty())
+				return *this;
+
+			u8string copy_str(*this);
+			if (copy_str.empty())
+				return copy_str;
+			size_t copy_str_size = copy_str.size();
+			size_t old_str_size = old_string.size();
+			if (copy_str_size < old_str_size)
+				return copy_str;
+
+			for (size_t i = 0; i <= (copy_str_size - old_str_size); ++i)
+			{
+				if (std::equal(copy_str._string.begin() + i, copy_str._string.end() + i + old_str_size, old_string._string.begin()))
+				{
+					std::copy(old_string._string.begin(), old_string._string.end(), copy_str._string.begin() + i);
+					if (!replace_all)
+						break;
+				}
+			}
+		}
+
+		u8char* find(std::function<bool(const u8char&)> func)
+		{
+			if (func == nullptr)
+				return nullptr;
+
+			for (auto& c : _string)
+			{
+				if (func(c))
+				{
+					return &c;
+				}
+			}
+			return nullptr;
+		}
+
+		std::vector<u8char*> find_all(std::function<bool(const u8char&)> func)
+		{
+			if (func == nullptr)
+				return std::vector<u8char*>();
+
+			std::vector<u8char*> find_results;
+			for (auto& c : _string)
+			{
+				if (func(c))
+				{
+					find_results.push_back(&c);
+				}
+			}
+			return find_results;
+		}
+
 		std::u8string join(const u8string& u8str2)
 		{
 			return *this += u8str2;
@@ -714,7 +1026,7 @@ namespace liquid::encode
 			return tmp;
 		}
 
-		u8char operator[](size_t index) const
+		u8char& operator[](size_t index)
 		{
 			return _string[index];
 		}

@@ -5,9 +5,9 @@
 // Implement for the version C++17.
 
 #include <iostream>
-#include <vector>
 #include <string>
 #include "u8exception.h"
+#include <vector>
 
 namespace liquid::encode
 {
@@ -253,9 +253,9 @@ namespace liquid::encode
 // Implement for the version C++20 and later.
 
 #include <iostream>
-#include <vector>
 #include <string>
 #include "u8exception.h"
+#include <vector>
 
 namespace liquid::encode
 {
