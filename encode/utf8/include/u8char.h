@@ -582,4 +582,12 @@ namespace liquid::encode
 }
 #endif
 
+namespace liquid::encode
+{
+	u8char operator""_utf8char(const char* str, std::size_t size)
+	{
+		return u8char(std::string(str, size));
+	}
+}
+
 #endif
