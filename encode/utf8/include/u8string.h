@@ -1,265 +1,601 @@
 #ifndef __U8STRING_H__
 #define __U8STRING_H__
 
+#if __cplusplus >= 201700L && __cplusplus < 202000L
+// Implement for the version C++17.
+
+
+
+#elif __cplusplus >= 202000L && __cplusplus < 202300L
+// Implement for the version C++20.
+
 #include <iostream>
 #include <vector>
 #include <string>
 #include <ranges>
 #include "u8char.h"
 
-namespace liquid
+namespace liquid::encode
 {
-	namespace encode
+	class u8string
 	{
-		class u8string
+	public:
+		u8string(const std::u8string& string)
 		{
-		public:
-			u8string(const std::u8string& string)
+			std::vector<std::vector<char8_t>> u8char_list;
+
+			auto lastIter = string.begin();
+			auto iter = string.begin();
+			while (true)
 			{
-				auto u8slice = [](const auto& c1, const auto& c2) { return (0b11000000 & char(c2)) == 0b10000000; };
-				auto u8char_list = string | std::ranges::views::chunk_by(u8slice);
-
-				for (const auto& temp_u8char : u8char_list)
+				bool needBreak = false;
+				bool needCollect = false;
+				if (iter == string.end())
 				{
-					unsigned long count = std::ranges::distance(temp_u8char);
-					if (count > 4)
-					{
-						clear();
-						throw u8exception(
-							U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
-							"A utf-8 character needs to be within 4 bytes."
-						);
-					}
-
-					std::vector<char8_t> u8char_parts;
-					for (const char8_t& u8char_part : temp_u8char)
-					{
-						u8char_parts.push_back(u8char_part);
-					}
-
-					u8char c(u8char_parts);
-					_string.push_back(c);
+					needBreak = true;
+					needCollect = true;
 				}
-			}
-
-			u8string(const char8_t* const string) : u8string((std::u8string)string) {}
-
-			u8string(const std::vector<char8_t>& string) : u8string(string.data()) {}
-
-			u8string(const std::string& string)
-			{
-				auto u8slice = [](const auto& c1, const auto& c2) { return (0b11000000 & char(c2)) == 0b10000000; };
-				auto u8char_list = string | std::ranges::views::chunk_by(u8slice);
-
-				for (const auto& temp_u8char : u8char_list)
+				else
 				{
-					unsigned long count = std::ranges::distance(temp_u8char);
-					if (count > 4)
+					const char8_t& c = *iter;
+					if (!((0b11000000 & c) == 0b10000000))
 					{
-						clear();
-						throw u8exception(
-							U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
-							"A utf-8 character needs to be within 4 bytes."
-						);
+						needCollect = true;
 					}
-
-					std::vector<char8_t> u8char_parts;
-					for (const char8_t& u8char_part : temp_u8char)
-					{
-						u8char_parts.push_back(u8char_part);
-					}
-
-					u8char c(u8char_parts);
-					_string.push_back(c);
-				}
-			}
-
-			u8string(const char* const string) : u8string((std::string)string) {}
-
-			u8string(const std::vector<char>& string) : u8string(string.data()) {}
-
-			u8string(const std::vector<u8char>& string)
-			{
-				_string = string;
-			}
-
-			std::vector<u8string> split(const u8char& delimiter)
-			{
-				std::vector<u8string> result;
-				if (_string.empty())
-					return result;
-
-				auto iter = _string.begin();
-				while (true)
-				{
-					std::vector<u8char> part;
-					auto part_end = std::find(iter, _string.end(), delimiter);
-					for (auto i = iter; i < part_end; ++i)
-					{
-						part.push_back(*i);
-					}
-					u8string part_str(part);
-					result.push_back(part_str);
-
-					if (part_end >= _string.end() - 1)
-						break;
-					iter = part_end + 1;
 				}
 
+				if (needCollect)
+				{
+					std::vector<char8_t> utf8char(lastIter, iter);
+					if (!utf8char.empty())
+					{
+						u8char_list.push_back(utf8char);
+					}
+					lastIter = iter;
+				}
+
+				if (needBreak)
+					break;
+				++iter;
+			}
+
+			for (const auto& temp_u8char : u8char_list)
+			{
+				unsigned long count = std::ranges::distance(temp_u8char);
+				if (count > 4)
+				{
+					clear();
+					throw u8exception(
+						U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
+						"A utf-8 character needs to be within 4 bytes."
+					);
+				}
+
+				std::vector<char8_t> u8char_parts;
+				for (const char8_t& u8char_part : temp_u8char)
+				{
+					u8char_parts.push_back(u8char_part);
+				}
+
+				u8char c(u8char_parts);
+				_string.push_back(c);
+			}
+		}
+
+		u8string(const char8_t* const string) : u8string((std::u8string)string) {}
+
+		u8string(const std::vector<char8_t>& string) : u8string(string.data()) {}
+
+		u8string(const std::string& string)
+		{
+			std::vector<std::vector<char>> u8char_list;
+
+			auto lastIter = string.begin();
+			auto iter = string.begin();
+			while (true)
+			{
+				bool needBreak = false;
+				bool needCollect = false;
+				if (iter == string.end())
+				{
+					needBreak = true;
+					needCollect = true;
+				}
+				else
+				{
+					const char& c = *iter;
+					if (!((0b11000000 & c) == 0b10000000))
+					{
+						needCollect = true;
+					}
+				}
+
+				if (needCollect)
+				{
+					std::vector<char> utf8char(lastIter, iter);
+					if (!utf8char.empty())
+					{
+						u8char_list.push_back(utf8char);
+					}
+					lastIter = iter;
+				}
+
+				if (needBreak)
+					break;
+				++iter;
+			}
+
+			for (const auto& temp_u8char : u8char_list)
+			{
+				unsigned long count = std::ranges::distance(temp_u8char);
+				if (count > 4)
+				{
+					clear();
+					throw u8exception(
+						U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
+						"A utf-8 character needs to be within 4 bytes."
+					);
+				}
+
+				std::vector<char8_t> u8char_parts;
+				for (const char8_t& u8char_part : temp_u8char)
+				{
+					u8char_parts.push_back(u8char_part);
+				}
+
+				u8char c(u8char_parts);
+				_string.push_back(c);
+			}
+		}
+
+		u8string(const char* const string) : u8string((std::string)string) {}
+
+		u8string(const std::vector<char>& string) : u8string(string.data()) {}
+
+		u8string(const std::vector<u8char>& string)
+		{
+			_string = string;
+		}
+
+		std::vector<u8string> split(const u8char& delimiter)
+		{
+			std::vector<u8string> result;
+			if (_string.empty())
 				return result;
-			}
 
-			std::u8string join(const u8string& u8str2)
+			auto iter = _string.begin();
+			while (true)
 			{
-				return *this += u8str2;
-			}
-
-			bool empty() const
-			{
-				return _string.size() == 0;
-			}
-
-			void clear()
-			{
-				_string.clear();
-			}
-
-			size_t size() const
-			{
-				return _string.size();
-			}
-
-			std::string to_string() const
-			{
-				std::string tmp;
-				for (const auto& c : _string)
+				std::vector<u8char> part;
+				auto part_end = std::find(iter, _string.end(), delimiter);
+				for (auto i = iter; i < part_end; ++i)
 				{
-					tmp += c.to_string();
+					part.push_back(*i);
 				}
-				return tmp;
+				u8string part_str(part);
+				result.push_back(part_str);
+
+				if (part_end >= _string.end() - 1)
+					break;
+				iter = part_end + 1;
 			}
 
-			std::u8string to_u8string() const
+			return result;
+		}
+
+		std::u8string join(const u8string& u8str2)
+		{
+			return *this += u8str2;
+		}
+
+		bool empty() const
+		{
+			return _string.size() == 0;
+		}
+
+		void clear()
+		{
+			_string.clear();
+		}
+
+		size_t size() const
+		{
+			return _string.size();
+		}
+
+		std::string to_string() const
+		{
+			std::string tmp;
+			for (const auto& c : _string)
 			{
-				std::u8string tmp;
-				for (const auto& c : _string)
-				{
-					tmp += c.to_u8string();
-				}
-				return tmp;
+				tmp += c.to_string();
 			}
+			return tmp;
+		}
 
-			u8char operator[](size_t index) const
+		std::u8string to_u8string() const
+		{
+			std::u8string tmp;
+			for (const auto& c : _string)
 			{
-				return _string[index];
+				tmp += c.to_u8string();
 			}
+			return tmp;
+		}
 
-			bool operator==(const u8char& other) const
+		u8char operator[](size_t index) const
+		{
+			return _string[index];
+		}
+
+		bool operator==(const u8char& other) const
+		{
+			return to_string() == other.to_string();
+		}
+
+		bool operator!=(const u8char& other) const
+		{
+			return to_string() != other.to_string();
+		}
+
+		friend u8string operator+(const u8string& u8str1, const u8string& u8str2)
+		{
+			std::vector<u8char> tmp = u8str1._string;
+			for (const auto& c : u8str2._string)
 			{
-				return to_string() == other.to_string();
+				tmp.push_back(c);
 			}
+			u8string tmp_str(tmp);
+			return tmp;
+		}
 
-			bool operator!=(const u8char& other) const
+		friend u8string operator+=(u8string& u8str, const u8char& utf8_char)
+		{
+			u8str._string.push_back(utf8_char);
+			return u8str;
+		}
+
+		friend u8string operator+=(u8string& u8str, const u8string& u8str2)
+		{
+			u8str._string.insert(u8str._string.end(), u8str2._string.begin(), u8str2._string.end());
+			return u8str;
+		}
+
+		friend std::ostream& operator<<(std::ostream& os, const u8string& utf8_string)
+		{
+			for (const auto& c : utf8_string._string)
 			{
-				return to_string() != other.to_string();
+				os << c;
 			}
+			return os;
+		}
 
-			friend u8string operator+(const u8string& u8str1, const u8string& u8str2)
-			{
-				std::vector<u8char> tmp = u8str1._string;
-				for (const auto& c : u8str2._string)
-				{
-					tmp.push_back(c);
-				}
-				u8string tmp_str(tmp);
-				return tmp;
-			}
+		friend std::istream& operator>>(std::istream& is, u8string& utf8_string)
+		{
+			std::string tmp;
+			is >> tmp;
 
-			friend u8string operator+=(u8string& u8str, const u8char& utf8_char)
-			{
-				u8str._string.push_back(utf8_char);
-				return u8str;
-			}
+			u8string s(tmp);
+			utf8_string = s;
 
-			friend u8string operator+=(u8string& u8str, const u8string& u8str2)
-			{
-				u8str._string.append_range(u8str2._string);
-				return u8str;
-			}
+			return is;
+		}
 
-			friend std::ostream& operator<<(std::ostream& os, const u8string& utf8_string)
-			{
-				for (const auto& c : utf8_string._string)
-				{
-					os << c;
-				}
-				return os;
-			}
+		auto begin()
+		{
+			return _string.begin();
+		}
 
-			friend std::istream& operator>>(std::istream& is, u8string& utf8_string)
-			{
-				std::string tmp;
-				is >> tmp;
+		auto end()
+		{
+			return _string.end();
+		}
 
-				u8string s(tmp);
-				utf8_string = s;
+		auto rbegin()
+		{
+			return _string.rbegin();
+		}
 
-				return is;
-			}
+		auto rend()
+		{
+			return _string.rend();
+		}
 
-			auto begin()
-			{
-				return _string.begin();
-			}
+		auto cbegin() const
+		{
+			return _string.cbegin();
+		}
 
-			auto end()
-			{
-				return _string.end();
-			}
+		auto cend() const
+		{
+			return _string.cend();
+		}
 
-			auto rbegin()
-			{
-				return _string.rbegin();
-			}
+		auto crbegin() const
+		{
+			return _string.crbegin();
+		}
 
-			auto rend()
-			{
-				return _string.rend();
-			}
+		auto crend() const
+		{
+			return _string.crend();
+		}
 
-			auto cbegin() const
-			{
-				return _string.cbegin();
-			}
+		operator std::string() const
+		{
+			return to_string();
+		}
 
-			auto cend() const
-			{
-				return _string.cend();
-			}
-
-			auto crbegin() const
-			{
-				return _string.crbegin();
-			}
-
-			auto crend() const
-			{
-				return _string.crend();
-			}
-
-			operator std::string() const
-			{
-				return to_string();
-			}
-
-			operator std::u8string() const
-			{
-				return to_u8string();
-			}
-		private:
-			std::vector<u8char> _string;
-		};
-	}
+		operator std::u8string() const
+		{
+			return to_u8string();
+		}
+	private:
+		std::vector<u8char> _string;
+	};
 }
+
+#else
+// Implement for versions C++23 and later.
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <ranges>
+#include "u8char.h"
+
+namespace liquid::encode
+{
+	class u8string
+	{
+	public:
+		u8string(const std::u8string& string)
+		{
+			auto u8slice = [](const auto& c1, const auto& c2) { return (0b11000000 & c2) == 0b10000000; };
+			auto u8char_list = string | std::ranges::views::chunk_by(u8slice);
+
+			for (const auto& temp_u8char : u8char_list)
+			{
+				unsigned long count = std::ranges::distance(temp_u8char);
+				if (count > 4)
+				{
+					clear();
+					throw u8exception(
+						U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
+						"A utf-8 character needs to be within 4 bytes."
+					);
+				}
+
+				std::vector<char8_t> u8char_parts;
+				for (const char8_t& u8char_part : temp_u8char)
+				{
+					u8char_parts.push_back(u8char_part);
+				}
+
+				u8char c(u8char_parts);
+				_string.push_back(c);
+			}
+		}
+
+		u8string(const char8_t* const string) : u8string((std::u8string)string) {}
+
+		u8string(const std::vector<char8_t>& string) : u8string(string.data()) {}
+
+		u8string(const std::string& string)
+		{
+			auto u8slice = [](const auto& c1, const auto& c2) { return (0b11000000 & c2) == 0b10000000; };
+			auto u8char_list = string | std::ranges::views::chunk_by(u8slice);
+
+			for (const auto& temp_u8char : u8char_list)
+			{
+				unsigned long count = std::ranges::distance(temp_u8char);
+				if (count > 4)
+				{
+					clear();
+					throw u8exception(
+						U8_EXCEPTION_TYPE::INVAILD_UTF8_ENCODE,
+						"A utf-8 character needs to be within 4 bytes."
+					);
+				}
+
+				std::vector<char8_t> u8char_parts;
+				for (const char8_t& u8char_part : temp_u8char)
+				{
+					u8char_parts.push_back(u8char_part);
+				}
+
+				u8char c(u8char_parts);
+				_string.push_back(c);
+			}
+		}
+
+		u8string(const char* const string) : u8string((std::string)string) {}
+
+		u8string(const std::vector<char>& string) : u8string(string.data()) {}
+
+		u8string(const std::vector<u8char>& string)
+		{
+			_string = string;
+		}
+
+		std::vector<u8string> split(const u8char& delimiter)
+		{
+			std::vector<u8string> result;
+			if (_string.empty())
+				return result;
+
+			auto iter = _string.begin();
+			while (true)
+			{
+				std::vector<u8char> part;
+				auto part_end = std::find(iter, _string.end(), delimiter);
+				for (auto i = iter; i < part_end; ++i)
+				{
+					part.push_back(*i);
+				}
+				u8string part_str(part);
+				result.push_back(part_str);
+
+				if (part_end >= _string.end() - 1)
+					break;
+				iter = part_end + 1;
+			}
+
+			return result;
+		}
+
+		std::u8string join(const u8string& u8str2)
+		{
+			return *this += u8str2;
+		}
+
+		bool empty() const
+		{
+			return _string.size() == 0;
+		}
+
+		void clear()
+		{
+			_string.clear();
+		}
+
+		size_t size() const
+		{
+			return _string.size();
+		}
+
+		std::string to_string() const
+		{
+			std::string tmp;
+			for (const auto& c : _string)
+			{
+				tmp += c.to_string();
+			}
+			return tmp;
+		}
+
+		std::u8string to_u8string() const
+		{
+			std::u8string tmp;
+			for (const auto& c : _string)
+			{
+				tmp += c.to_u8string();
+			}
+			return tmp;
+		}
+
+		u8char operator[](size_t index) const
+		{
+			return _string[index];
+		}
+
+		bool operator==(const u8char& other) const
+		{
+			return to_string() == other.to_string();
+		}
+
+		bool operator!=(const u8char& other) const
+		{
+			return to_string() != other.to_string();
+		}
+
+		friend u8string operator+(const u8string& u8str1, const u8string& u8str2)
+		{
+			std::vector<u8char> tmp = u8str1._string;
+			for (const auto& c : u8str2._string)
+			{
+				tmp.push_back(c);
+			}
+			u8string tmp_str(tmp);
+			return tmp;
+		}
+
+		friend u8string operator+=(u8string& u8str, const u8char& utf8_char)
+		{
+			u8str._string.push_back(utf8_char);
+			return u8str;
+		}
+
+		friend u8string operator+=(u8string& u8str, const u8string& u8str2)
+		{
+			u8str._string.append_range(u8str2._string);
+			return u8str;
+		}
+
+		friend std::ostream& operator<<(std::ostream& os, const u8string& utf8_string)
+		{
+			for (const auto& c : utf8_string._string)
+			{
+				os << c;
+			}
+			return os;
+		}
+
+		friend std::istream& operator>>(std::istream& is, u8string& utf8_string)
+		{
+			std::string tmp;
+			is >> tmp;
+
+			u8string s(tmp);
+			utf8_string = s;
+
+			return is;
+		}
+
+		auto begin()
+		{
+			return _string.begin();
+		}
+
+		auto end()
+		{
+			return _string.end();
+		}
+
+		auto rbegin()
+		{
+			return _string.rbegin();
+		}
+
+		auto rend()
+		{
+			return _string.rend();
+		}
+
+		auto cbegin() const
+		{
+			return _string.cbegin();
+		}
+
+		auto cend() const
+		{
+			return _string.cend();
+		}
+
+		auto crbegin() const
+		{
+			return _string.crbegin();
+		}
+
+		auto crend() const
+		{
+			return _string.crend();
+		}
+
+		operator std::string() const
+		{
+			return to_string();
+		}
+
+		operator std::u8string() const
+		{
+			return to_u8string();
+		}
+	private:
+		std::vector<u8char> _string;
+	};
+}
+
+#endif
 
 #endif

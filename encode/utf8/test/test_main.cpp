@@ -12,6 +12,7 @@ int main()
 	std::u8string tmps0 = u8"你好，世界！";
 	liquid::encode::u8string str0 = tmps0;
 	liquid::encode::u8string str1(u8"编码");
+	liquid::encode::u8string str2("开发");
 
 	str0 += c2;
 	std::cout << str0 << std::endl;
