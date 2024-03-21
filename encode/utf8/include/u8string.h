@@ -214,6 +214,11 @@ namespace liquid::encode
 			return find_results;
 		}
 
+		u8string append(const u8string& u8str2)
+		{
+			return *this += u8str2;
+		}
+
 		bool empty() const
 		{
 			return _string.size() == 0;
@@ -624,7 +629,7 @@ namespace liquid::encode
 			return find_results;
 		}
 
-		std::u8string join(const u8string& u8str2)
+		u8string append(const u8string& u8str2)
 		{
 			return *this += u8str2;
 		}
@@ -986,7 +991,7 @@ namespace liquid::encode
 			return find_results;
 		}
 
-		std::u8string join(const u8string& u8str2)
+		u8string append(const u8string& u8str2)
 		{
 			return *this += u8str2;
 		}
