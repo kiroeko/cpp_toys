@@ -566,7 +566,6 @@ namespace liquid::encode
 	};
 }
 #else
-
 // Implement for versions C++23 and later.
 
 #include <iostream>
