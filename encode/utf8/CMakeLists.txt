@@ -43,7 +43,6 @@ if (NOT CMAKE_GENERATOR_PLATFORM)
     set(CMAKE_GENERATOR_PLATFORM x64)
 endif()
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
-add_definitions("-DUNICODE" "-D_UNICODE")
 
 # Set output directory
 string(TOLOWER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME_STR)
@@ -55,6 +54,17 @@ make_directory(${OUTPUT_BIN_DIR_RELEASE})
 
 # Create executable
 add_executable(${PROJECT_NAME})
+
+# Set complie options
+if (MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        -D_UNICODE -DUNICODE "/Zc:__cplusplus"
+    )
+else()
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        -D_UNICODE -DUNICODE
+    )
+endif()
 
 # Set properties
 set_target_properties(${PROJECT_NAME}
@@ -69,8 +79,7 @@ set_target_properties(${PROJECT_NAME}
 # Collect all source files
 file(GLOB_RECURSE SRC_LIST
     ${PROJECT_SOURCE_DIR}/include/*.h
-    ${PROJECT_SOURCE_DIR}/src/*.c   
-    ${PROJECT_SOURCE_DIR}/src/*.cpp)
+    ${PROJECT_SOURCE_DIR}/test/*.cpp)
 source_group_by_dir(SRC_LIST)
 
 # Set sources

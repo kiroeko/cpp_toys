@@ -4,8 +4,10 @@
 #include <string>
 #include <stdexcept>
 
-namespace liquid {
-	namespace encode {
+namespace liquid
+{
+	namespace encode
+	{
 		enum U8_EXCEPTION_TYPE
 		{
 			INVAILD_UTF8_ENCODE
