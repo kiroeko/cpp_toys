@@ -9,7 +9,7 @@
 #include <ranges>
 #include <string>
 #include <vector>
-#include "u8char.h"
+#include "encode/utf8/u8char.h"
 
 namespace liquid::encode
 {
@@ -358,7 +358,7 @@ namespace liquid::encode
 #include <ranges>
 #include <string>
 #include <vector>
-#include "u8char.h"
+#include "encode/utf8/u8char.h"
 
 namespace liquid::encode
 {
@@ -788,7 +788,7 @@ namespace liquid::encode
 #include <ranges>
 #include <string>
 #include <vector>
-#include "u8char.h"
+#include "encode/utf8/u8char.h"
 
 namespace liquid::encode
 {

@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include <string>
-#include "u8exception.h"
+#include "encode/utf8/u8exception.h"
 #include <vector>
 
 namespace liquid::encode

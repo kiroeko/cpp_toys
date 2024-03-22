@@ -1,5 +1,5 @@
-#include "u8char.h"
-#include "u8string.h"
+#include "encode/utf8/u8char.h"
+#include "encode/utf8/u8string.h"
 #include <string>
 
 using namespace liquid::encode;
